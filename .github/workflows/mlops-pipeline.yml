@@ -22,7 +22,8 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install yfinance pandas numpy scikit-learn joblib
+        pip install --upgrade pip
+        pip install -r requirements.txt
     
     - name: Run model training
       run: |
