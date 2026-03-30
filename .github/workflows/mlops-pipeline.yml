@@ -1,0 +1,52 @@
+name: MLOps Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install yfinance pandas numpy scikit-learn joblib
+    
+    - name: Run model training
+      run: |
+        python src/stock_forecast.py
+    
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: model-artifacts
+        path: |
+          model.pkl
+          metrics.csv
+          forecast.txt
+          metadata.json
+        retention-days: 30
+    
+    - name: Display forecast
+      run: |
+        echo "========================================"
+        echo "📊 Model Performance:"
+        echo "========================================"
+        cat metrics.csv
+        echo ""
+        echo "========================================"
+        echo "📅 Forecast:"
+        echo "========================================"
+        cat forecast.txt
